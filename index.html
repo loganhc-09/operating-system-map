@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logan's Operating System — Architecture Map</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f6f5f1;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --grid: rgba(0,0,0,0.03);
+    --source: #0e7490;
+    --source-dim: rgba(14, 116, 144, 0.07);
+    --proc: #7c3aed;
+    --proc-dim: rgba(124, 58, 237, 0.06);
+    --mem: #059669;
+    --mem-dim: rgba(5, 150, 105, 0.06);
+    --learn: #b45309;
+    --learn-dim: rgba(180, 83, 9, 0.05);
+    --output: #0d9488;
+    --output-dim: rgba(13, 148, 136, 0.06);
+    --loop: #dc2626;
+    --loop-dim: rgba(220, 38, 38, 0.04);
+    --text: #1e293b;
+    --text-dim: rgba(30, 41, 59, 0.5);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background grid + glow ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 900px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(5,150,105,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .scene { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 48px 40px 72px; }
+
+  /* ── Header ── */
+  header { text-align: center; margin-bottom: 56px; position: relative; }
+
+  header h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: #0f172a;
+    line-height: 1.1;
+  }
+
+  header .sub {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    margin-top: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  header .accent-line {
+    width: 64px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--mem), transparent);
+    margin: 18px auto 0;
+    border-radius: 1px;
+  }
+
+  /* ── Layers ── */
+  .layer { margin-bottom: 8px; }
+
+  .layer-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .layer-head .pip {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .layer-head .label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .layer-head .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, currentColor, transparent);
+    opacity: 0.15;
+  }
+
+  /* ── Node grid ── */
+  .nodes {
+    display: grid;
+    gap: 10px;
+  }
+
+  .nodes.cols-6 { grid-template-columns: repeat(6, 1fr); }
+  .nodes.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+  /* ── Node cards ── */
+  .node {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 10px;
+    padding: 18px 14px 14px;
+    text-align: center;
+    transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s;
+    cursor: default;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .node::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 10px 10px 0 0;
+    opacity: 0.85;
+  }
+
+  .node:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0,0,0,0.1);
+  }
+
+  .node .n-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .node .n-detail {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--text-dim);
+  }
+
+  /* -- Source nodes */
+  .node.src::before { background: linear-gradient(90deg, var(--source), transparent); }
+  .node.src { background: linear-gradient(165deg, var(--source-dim), var(--bg-card) 60%); }
+  .node.src .n-name { color: var(--source); }
+  .node.src:hover { box-shadow: 0 6px 24px rgba(14,116,144,0.1); }
+
+  /* -- Processor nodes */
+  .node.proc::before { background: linear-gradient(90deg, var(--proc), transparent); }
+  .node.proc { background: linear-gradient(165deg, var(--proc-dim), var(--bg-card) 60%); }
+  .node.proc .n-name { color: var(--proc); }
+  .node.proc:hover { box-shadow: 0 6px 24px rgba(124,58,237,0.1); }
+
+  /* -- Memory nodes */
+  .node.mem::before { background: linear-gradient(90deg, var(--mem), transparent); }
+  .node.mem { background: linear-gradient(165deg, var(--mem-dim), var(--bg-card) 60%); }
+  .node.mem .n-name { color: var(--mem); }
+  .node.mem:hover { box-shadow: 0 6px 24px rgba(5,150,105,0.1); }
+
+  /* -- Central memory node */
+  .node.mem-core {
+    background: linear-gradient(165deg, rgba(5,150,105,0.1), var(--bg-card) 50%);
+    border-color: rgba(5,150,105,0.25);
+    padding: 22px 16px 18px;
+  }
+  .node.mem-core::before { background: var(--mem); opacity: 1; }
+  .node.mem-core .n-name { font-size: 0.95rem; }
+  .node.mem-core:hover { box-shadow: 0 8px 40px rgba(5,150,105,0.12); }
+
+  /* -- Learning nodes */
+  .node.learn::before { background: linear-gradient(90deg, var(--learn), transparent); }
+  .node.learn { background: linear-gradient(165deg, var(--learn-dim), var(--bg-card) 60%); }
+  .node.learn .n-name { color: var(--learn); }
+  .node.learn:hover { box-shadow: 0 6px 24px rgba(180,83,9,0.1); }
+
+  /* -- Output nodes */
+  .node.out::before { background: linear-gradient(90deg, var(--output), transparent); }
+  .node.out { background: linear-gradient(165deg, var(--output-dim), var(--bg-card) 60%); }
+  .node.out .n-name { color: var(--output); }
+  .node.out:hover { box-shadow: 0 6px 24px rgba(13,148,136,0.1); }
+
+  /* ── Flow connector SVG between layers ── */
+  .flow-svg {
+    display: block;
+    width: 100%;
+    height: 36px;
+    overflow: visible;
+  }
+
+  .flow-svg line {
+    stroke: rgba(0,0,0,0.08);
+    stroke-width: 1;
+  }
+
+  .flow-dot {
+    fill: currentColor;
+    opacity: 0.6;
+  }
+
+  @keyframes flowDown {
+    0% { transform: translateY(-12px); opacity: 0; }
+    30% { opacity: 0.7; }
+    70% { opacity: 0.7; }
+    100% { transform: translateY(12px); opacity: 0; }
+  }
+
+  .flow-dot { animation: flowDown 2.4s ease-in-out infinite; }
+
+  /* ── Memory zone ── */
+  .mem-zone {
+    position: relative;
+    border: 1px solid rgba(5,150,105,0.15);
+    border-radius: 16px;
+    padding: 24px 20px 28px;
+    margin-bottom: 8px;
+    background: radial-gradient(ellipse at 50% 30%, rgba(5,150,105,0.03), transparent 70%);
+  }
+
+  .mem-zone::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(5,150,105,0.06), transparent 40%);
+    z-index: -1;
+  }
+
+  .db-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin: 14px 0 20px;
+    padding: 0 30px;
+  }
+
+  .db-tag {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    font-weight: 400;
+    background: rgba(5,150,105,0.05);
+    border: 1px solid rgba(5,150,105,0.12);
+    border-radius: 3px;
+    padding: 2px 9px;
+    color: rgba(5,150,105,0.6);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .db-tag:hover {
+    color: var(--mem);
+    border-color: rgba(5,150,105,0.3);
+  }
+
+  .mem-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(180,83,9,0.15), transparent);
+    margin: 0 40px 16px;
+  }
+
+  /* ── Feedback loop rails ── */
+  .architecture {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    position: relative;
+  }
+
+  .rail {
+    flex: 0 0 52px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .rail-track {
+    width: 2px;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rail-track::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(220,38,38,0.05), rgba(220,38,38,0.15), rgba(220,38,38,0.05));
+  }
+
+  .rail-particle {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, var(--loop), transparent);
+    border-radius: 2px;
+    left: 0;
+  }
+
+  .rail.left .rail-particle { animation: railUp 4s linear infinite; }
+  .rail.right .rail-particle { animation: railDown 4s linear infinite; }
+
+  @keyframes railUp {
+    0% { bottom: -20px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { bottom: 100%; opacity: 0; }
+  }
+
+  @keyframes railDown {
+    0% { top: -20px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .rail-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--loop);
+    padding: 12px 0;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+
+  .rail-meta {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    color: rgba(220,38,38,0.4);
+    padding: 6px 0;
+    line-height: 1.6;
+  }
+
+  .main-col { flex: 1; min-width: 0; }
+
+  /* ── Human Hub ── */
+  .human-hub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 8px;
+    padding: 0;
+    position: relative;
+  }
+
+  .human-hub-card {
+    position: relative;
+    background: linear-gradient(165deg, rgba(220,38,38,0.04), rgba(255,255,255,0.95) 40%);
+    border: 2px solid rgba(220,38,38,0.2);
+    border-radius: 16px;
+    padding: 28px 40px 24px;
+    text-align: center;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 4px 24px rgba(220,38,38,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .human-hub-card:hover {
+    border-color: rgba(220,38,38,0.35);
+    box-shadow: 0 8px 40px rgba(220,38,38,0.1), 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .human-hub-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--loop), transparent);
+    border-radius: 16px 16px 0 0;
+    opacity: 0.7;
+  }
+
+  /* Pulsing ring behind the avatar */
+  .human-avatar {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+  }
+
+  .human-avatar .ring {
+    position: absolute;
+    inset: -6px;
+    border: 2px solid rgba(220,38,38,0.15);
+    border-radius: 50%;
+    animation: ringPulse 3s ease-in-out infinite;
+  }
+
+  .human-avatar .ring:nth-child(2) {
+    inset: -14px;
+    border-color: rgba(220,38,38,0.08);
+    animation-delay: 0.5s;
+  }
+
+  .human-avatar .core {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 20px rgba(220,38,38,0.2);
+  }
+
+  .human-avatar .core span {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.5; }
+  }
+
+  .human-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+
+  .human-role {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--loop);
+    margin-bottom: 12px;
+  }
+
+  .human-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .human-action {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    font-weight: 400;
+    background: rgba(220,38,38,0.04);
+    border: 1px solid rgba(220,38,38,0.1);
+    border-radius: 4px;
+    padding: 4px 10px;
+    color: rgba(220,38,38,0.6);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .human-action:hover {
+    color: var(--loop);
+    border-color: rgba(220,38,38,0.25);
+  }
+
+  .loop-caption {
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  .loop-caption .loop-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--loop);
+    margin-bottom: 5px;
+  }
+
+  .loop-caption .loop-desc {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* ── Staggered entrance ── */
+  .layer, .mem-zone, .flow-svg, .human-hub {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .layer:nth-child(1) { animation-delay: 0.15s; }
+  .flow-svg:nth-of-type(1) { animation-delay: 0.3s; }
+  .layer:nth-child(3) { animation-delay: 0.4s; }
+  .flow-svg:nth-of-type(2) { animation-delay: 0.55s; }
+  .mem-zone { animation-delay: 0.65s; }
+  .flow-svg:nth-of-type(3) { animation-delay: 0.8s; }
+  .layer:nth-child(6) { animation-delay: 0.9s; }
+  .human-hub { animation-delay: 1.05s; }
+
+  @keyframes reveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1000px) {
+    .nodes.cols-6 { grid-template-columns: repeat(3, 1fr); }
+    .nodes.cols-5 { grid-template-columns: repeat(3, 1fr); }
+    .rail { flex: 0 0 36px; }
+    .scene { padding: 32px 16px 48px; }
+    header h1 { font-size: 1.8rem; }
+  }
+
+  @media (max-width: 600px) {
+    .nodes.cols-6, .nodes.cols-5 { grid-template-columns: repeat(2, 1fr); }
+    .rail { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+
+  <header>
+    <h1>Logan's Operating System</h1>
+    <p class="sub">information architecture & learning loop</p>
+    <div class="accent-line"></div>
+  </header>
+
+  <div class="architecture">
+
+    <!-- Left rail: context injection (upward) -->
+    <div class="rail left">
+      <div class="rail-track">
+        <div class="rail-particle" style="animation-delay: 0s;"></div>
+        <div class="rail-particle" style="animation-delay: 2s;"></div>
+      </div>
+      <div class="rail-label">Context Injection</div>
+      <div class="rail-meta">QMD search / facts / meeting prep</div>
+      <div class="rail-track">
+        <div class="rail-particle" style="animation-delay: 1s;"></div>
+        <div class="rail-particle" style="animation-delay: 3s;"></div>
+      </div>
+    </div>
+
+    <!-- Main column -->
+    <div class="main-col">
+
+      <!-- ── DATA SOURCES ── -->
+      <div class="layer">
+        <div class="layer-head">
+          <div class="pip" style="background: var(--source);"></div>
+          <div class="label" style="color: var(--source);">Data Sources</div>
+          <div class="line" style="color: var(--source);"></div>
+        </div>
+        <div class="nodes cols-6">
+          <div class="node src">
+            <div class="n-name">Granola Calls</div>
+            <div class="n-detail">Meeting transcripts<br>hourly sync</div>
+          </div>
+          <div class="node src">
+            <div class="n-name">Email</div>
+            <div class="n-detail">3 accounts<br>Gmail API</div>
+          </div>
+          <div class="node src">
+            <div class="n-name">Claude Sessions</div>
+            <div class="n-detail">Telegram<br>conversations</div>
+          </div>
+          <div class="node src">
+            <div class="n-name">Calendar</div>
+            <div class="n-detail">3 accounts<br>all events</div>
+          </div>
+          <div class="node src">
+            <div class="n-name">Apple Health</div>
+            <div class="n-detail">Sleep, steps<br>HRV, cycle</div>
+          </div>
+          <div class="node src">
+            <div class="n-name">TikTok / Feeds</div>
+            <div class="n-detail">Analytics, RSS<br>Substack</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow connectors -->
+      <svg class="flow-svg" viewBox="0 0 1000 36" preserveAspectRatio="none">
+        <line x1="100" y1="0" x2="100" y2="36"/>
+        <line x1="270" y1="0" x2="270" y2="36"/>
+        <line x1="440" y1="0" x2="440" y2="36"/>
+        <line x1="610" y1="0" x2="610" y2="36"/>
+        <line x1="780" y1="0" x2="780" y2="36"/>
+        <circle class="flow-dot" cx="100" cy="18" r="2" style="color:var(--source); animation-delay:0s"/>
+        <circle class="flow-dot" cx="270" cy="18" r="2" style="color:var(--source); animation-delay:0.4s"/>
+        <circle class="flow-dot" cx="440" cy="18" r="2" style="color:var(--source); animation-delay:0.8s"/>
+        <circle class="flow-dot" cx="610" cy="18" r="2" style="color:var(--source); animation-delay:1.2s"/>
+        <circle class="flow-dot" cx="780" cy="18" r="2" style="color:var(--source); animation-delay:1.6s"/>
+      </svg>
+
+      <!-- ── PROCESSORS ── -->
+      <div class="layer">
+        <div class="layer-head">
+          <div class="pip" style="background: var(--proc);"></div>
+          <div class="label" style="color: var(--proc);">Automated Processors</div>
+          <div class="line" style="color: var(--proc);"></div>
+        </div>
+        <div class="nodes cols-6">
+          <div class="node proc">
+            <div class="n-name">Meeting Processor</div>
+            <div class="n-detail">Commitments, follow-ups<br>content angles</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Sweep</div>
+            <div class="n-detail">12h reconciliation<br>midnight + noon</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Task Check</div>
+            <div class="n-detail">6x daily, sent folder<br>completion scan</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Prep Agent</div>
+            <div class="n-detail">1am drafts, overnight<br>message generation</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Retrospective</div>
+            <div class="n-detail">Daily review, patterns<br>Growth Edge</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Pollinate</div>
+            <div class="n-detail">2:30am, cross-domain<br>connection discovery</div>
+          </div>
+        </div>
+      </div>
+
+      <svg class="flow-svg" viewBox="0 0 1000 36" preserveAspectRatio="none">
+        <line x1="100" y1="0" x2="100" y2="36"/>
+        <line x1="270" y1="0" x2="270" y2="36"/>
+        <line x1="440" y1="0" x2="440" y2="36"/>
+        <line x1="610" y1="0" x2="610" y2="36"/>
+        <line x1="780" y1="0" x2="780" y2="36"/>
+        <circle class="flow-dot" cx="100" cy="18" r="2" style="color:var(--proc); animation-delay:0.2s"/>
+        <circle class="flow-dot" cx="270" cy="18" r="2" style="color:var(--proc); animation-delay:0.6s"/>
+        <circle class="flow-dot" cx="440" cy="18" r="2" style="color:var(--proc); animation-delay:1.0s"/>
+        <circle class="flow-dot" cx="610" cy="18" r="2" style="color:var(--proc); animation-delay:1.4s"/>
+        <circle class="flow-dot" cx="780" cy="18" r="2" style="color:var(--proc); animation-delay:1.8s"/>
+      </svg>
+
+      <!-- ── MEMORY ZONE ── -->
+      <div class="mem-zone">
+
+        <div class="layer" style="margin-bottom: 0;">
+          <div class="layer-head">
+            <div class="pip" style="background: var(--mem);"></div>
+            <div class="label" style="color: var(--mem);">Persistent Memory Architecture</div>
+            <div class="line" style="color: var(--mem);"></div>
+          </div>
+          <div class="nodes cols-5">
+            <div class="node mem">
+              <div class="n-name">QMD Semantic Index</div>
+              <div class="n-detail">3 collections: vault<br>memory, sessions</div>
+            </div>
+            <div class="node mem">
+              <div class="n-name">Session Transcripts</div>
+              <div class="n-detail">Full conversation<br>history</div>
+            </div>
+            <div class="node mem mem-core">
+              <div class="n-name">memory.db</div>
+              <div class="n-detail">SQLite &mdash; 20+ tables<br>The brain of the system</div>
+            </div>
+            <div class="node mem">
+              <div class="n-name">Tasks.md</div>
+              <div class="n-detail">Master task list<br>status tracking</div>
+            </div>
+            <div class="node mem">
+              <div class="n-name">Obsidian Vault</div>
+              <div class="n-detail">Full knowledge<br>archive</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="db-tags">
+          <span class="db-tag">facts</span>
+          <span class="db-tag">commitments</span>
+          <span class="db-tag">follow_ups</span>
+          <span class="db-tag">content_ideas</span>
+          <span class="db-tag">health_daily</span>
+          <span class="db-tag">reading_items</span>
+          <span class="db-tag">reading_prefs</span>
+          <span class="db-tag">pollinations</span>
+          <span class="db-tag">avoidance_log</span>
+          <span class="db-tag">effort_log</span>
+          <span class="db-tag">knowledge_profile</span>
+          <span class="db-tag">milestones</span>
+        </div>
+
+        <div class="mem-divider"></div>
+
+        <div class="layer" style="margin-bottom: 0;">
+          <div class="layer-head">
+            <div class="pip" style="background: var(--learn);"></div>
+            <div class="label" style="color: var(--learn);">Learning Layer</div>
+            <div class="line" style="color: var(--learn);"></div>
+          </div>
+          <div class="nodes cols-5">
+            <div class="node learn">
+              <div class="n-name">Preference Learning</div>
+              <div class="n-detail">Reading feedback<br>pillar weights, scores</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Pattern Detection</div>
+              <div class="n-detail">Avoidance signals<br>momentum, time</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Escalation Tracking</div>
+              <div class="n-detail">Follow-up aging<br>relationship risk</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Knowledge Profile</div>
+              <div class="n-detail">Concept mastery<br>reinforcement counts</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Behavioral Adaptation</div>
+              <div class="n-detail">CLAUDE.md updates<br>tone calibration</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <svg class="flow-svg" viewBox="0 0 1000 36" preserveAspectRatio="none">
+        <line x1="140" y1="0" x2="140" y2="36"/>
+        <line x1="340" y1="0" x2="340" y2="36"/>
+        <line x1="540" y1="0" x2="540" y2="36"/>
+        <line x1="740" y1="0" x2="740" y2="36"/>
+        <circle class="flow-dot" cx="140" cy="18" r="2" style="color:var(--mem); animation-delay:0.3s"/>
+        <circle class="flow-dot" cx="340" cy="18" r="2" style="color:var(--mem); animation-delay:0.7s"/>
+        <circle class="flow-dot" cx="540" cy="18" r="2" style="color:var(--mem); animation-delay:1.1s"/>
+        <circle class="flow-dot" cx="740" cy="18" r="2" style="color:var(--mem); animation-delay:1.5s"/>
+      </svg>
+
+      <!-- ── OUTPUTS ── -->
+      <div class="layer">
+        <div class="layer-head">
+          <div class="pip" style="background: var(--output);"></div>
+          <div class="label" style="color: var(--output);">Daily Outputs</div>
+          <div class="line" style="color: var(--output);"></div>
+        </div>
+        <div class="nodes cols-5">
+          <div class="node out">
+            <div class="n-name">Morning Briefing</div>
+            <div class="n-detail">Weather, calendar<br>priorities, health</div>
+          </div>
+          <div class="node out">
+            <div class="n-name">Follow-up Queue</div>
+            <div class="n-detail">Escalation tiers<br>recent / stale / critical</div>
+          </div>
+          <div class="node out">
+            <div class="n-name">Approval Queue</div>
+            <div class="n-detail">Pre-drafted messages<br>awaiting review</div>
+          </div>
+          <div class="node out">
+            <div class="n-name">Pollination Insights</div>
+            <div class="n-detail">Cross-domain links<br>novelty scored</div>
+          </div>
+          <div class="node out">
+            <div class="n-name">Dashboard</div>
+            <div class="n-detail">TikTok, Substack<br>website analytics</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow: outputs → human -->
+      <svg class="flow-svg" viewBox="0 0 1000 36" preserveAspectRatio="none">
+        <line x1="340" y1="0" x2="500" y2="36"/>
+        <line x1="500" y1="0" x2="500" y2="36"/>
+        <line x1="660" y1="0" x2="500" y2="36"/>
+        <circle class="flow-dot" cx="420" cy="18" r="2.5" style="color:var(--output); animation-delay:0.2s"/>
+        <circle class="flow-dot" cx="500" cy="18" r="2.5" style="color:var(--output); animation-delay:0.6s"/>
+        <circle class="flow-dot" cx="580" cy="18" r="2.5" style="color:var(--output); animation-delay:1.0s"/>
+      </svg>
+
+      <!-- ── HUMAN HUB ── -->
+      <div class="human-hub">
+        <div class="human-hub-card">
+          <div class="human-avatar">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="core"><span>LC</span></div>
+          </div>
+          <div class="human-name">Logan</div>
+          <div class="human-role">Human in the Loop</div>
+          <div class="human-actions">
+            <span class="human-action">approves messages</span>
+            <span class="human-action">corrects behavior</span>
+            <span class="human-action">sets preferences</span>
+            <span class="human-action">triggers actions</span>
+          </div>
+        </div>
+        <div class="loop-caption">
+          <div class="loop-title">The Learning Loop</div>
+          <div class="loop-desc">
+            Every correction, completion, and preference feeds back into memory &mdash; the system learns daily
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right rail: feedback loop (downward) -->
+    <div class="rail right">
+      <div class="rail-track">
+        <div class="rail-particle" style="animation-delay: 0.5s;"></div>
+        <div class="rail-particle" style="animation-delay: 2.5s;"></div>
+      </div>
+      <div class="rail-label">Feedback Loop</div>
+      <div class="rail-meta">corrections / preferences / completions</div>
+      <div class="rail-track">
+        <div class="rail-particle" style="animation-delay: 1.5s;"></div>
+        <div class="rail-particle" style="animation-delay: 3.5s;"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
