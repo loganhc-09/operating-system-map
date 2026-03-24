@@ -134,6 +134,7 @@
   }
 
   .nodes.cols-6 { grid-template-columns: repeat(6, 1fr); }
+  .nodes.cols-7 { grid-template-columns: repeat(7, 1fr); }
   .nodes.cols-5 { grid-template-columns: repeat(5, 1fr); }
 
   /* ── Node cards ── */
@@ -556,6 +557,7 @@
   /* ── Responsive ── */
   @media (max-width: 1000px) {
     .nodes.cols-6 { grid-template-columns: repeat(3, 1fr); }
+    .nodes.cols-7 { grid-template-columns: repeat(4, 1fr); }
     .nodes.cols-5 { grid-template-columns: repeat(3, 1fr); }
     .rail { flex: 0 0 36px; }
     .scene { padding: 32px 16px 48px; }
@@ -563,7 +565,7 @@
   }
 
   @media (max-width: 600px) {
-    .nodes.cols-6, .nodes.cols-5 { grid-template-columns: repeat(2, 1fr); }
+    .nodes.cols-6, .nodes.cols-7, .nodes.cols-5 { grid-template-columns: repeat(2, 1fr); }
     .rail { display: none; }
   }
 </style>
@@ -587,7 +589,7 @@
         <div class="rail-particle" style="animation-delay: 2s;"></div>
       </div>
       <div class="rail-label">Context Injection</div>
-      <div class="rail-meta">QMD search / facts / meeting prep</div>
+      <div class="rail-meta">QMD search / facts / reading prep</div>
       <div class="rail-track">
         <div class="rail-particle" style="animation-delay: 1s;"></div>
         <div class="rail-particle" style="animation-delay: 3s;"></div>
@@ -611,15 +613,15 @@
           </div>
           <div class="node src">
             <div class="n-name">Email</div>
-            <div class="n-detail">3 accounts<br>Gmail API</div>
+            <div class="n-detail">4 accounts<br>Gmail API</div>
           </div>
           <div class="node src">
-            <div class="n-name">Claude Sessions</div>
-            <div class="n-detail">Telegram<br>conversations</div>
+            <div class="n-name">Discord</div>
+            <div class="n-detail">Always-on bot<br>bidirectional</div>
           </div>
           <div class="node src">
             <div class="n-name">Calendar</div>
-            <div class="n-detail">3 accounts<br>all events</div>
+            <div class="n-detail">4 accounts<br>all events</div>
           </div>
           <div class="node src">
             <div class="n-name">Apple Health</div>
@@ -663,12 +665,12 @@
             <div class="n-detail">12h reconciliation<br>midnight + noon</div>
           </div>
           <div class="node proc">
-            <div class="n-name">Task Check</div>
-            <div class="n-detail">6x daily, sent folder<br>completion scan</div>
+            <div class="n-name">Intake</div>
+            <div class="n-detail">Nightly pipeline<br>email + calendar scan</div>
           </div>
           <div class="node proc">
-            <div class="n-name">Prep Agent</div>
-            <div class="n-detail">1am drafts, overnight<br>message generation</div>
+            <div class="n-name">Reading Scout</div>
+            <div class="n-detail">Feed curation<br>preference learning</div>
           </div>
           <div class="node proc">
             <div class="n-name">Retrospective</div>
@@ -770,6 +772,14 @@
             <div class="node learn">
               <div class="n-name">Behavioral Adaptation</div>
               <div class="n-detail">CLAUDE.md updates<br>tone calibration</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Learning Loop</div>
+              <div class="n-detail">Weekly evolution<br>system self-improvement</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Content Scout</div>
+              <div class="n-detail">Idea mining<br>angle generation</div>
             </div>
           </div>
         </div>
