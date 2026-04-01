@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logan's Operating System — Architecture Map</title>
+<title>Logan's Operating System — Architecture Map v2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
@@ -15,6 +15,9 @@
     --source-dim: rgba(14, 116, 144, 0.07);
     --proc: #7c3aed;
     --proc-dim: rgba(124, 58, 237, 0.06);
+    --braid: #be185d;
+    --braid-dim: rgba(190, 24, 93, 0.05);
+    --braid-glow: rgba(190, 24, 93, 0.08);
     --mem: #059669;
     --mem-dim: rgba(5, 150, 105, 0.06);
     --learn: #b45309;
@@ -23,6 +26,8 @@
     --output-dim: rgba(13, 148, 136, 0.06);
     --loop: #dc2626;
     --loop-dim: rgba(220, 38, 38, 0.04);
+    --bus: #6366f1;
+    --bus-dim: rgba(99, 102, 241, 0.05);
     --text: #1e293b;
     --text-dim: rgba(30, 41, 59, 0.5);
     --mono: 'JetBrains Mono', monospace;
@@ -39,7 +44,6 @@
     overflow-x: hidden;
   }
 
-  /* ── Background grid + glow ── */
   body::before {
     content: '';
     position: fixed;
@@ -85,6 +89,21 @@
     color: var(--text-dim);
     margin-top: 10px;
     letter-spacing: 0.06em;
+  }
+
+  header .version-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: rgba(190, 24, 93, 0.08);
+    color: var(--braid);
+    border: 1px solid rgba(190, 24, 93, 0.15);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-top: 12px;
   }
 
   header .accent-line {
@@ -136,6 +155,8 @@
   .nodes.cols-6 { grid-template-columns: repeat(6, 1fr); }
   .nodes.cols-7 { grid-template-columns: repeat(7, 1fr); }
   .nodes.cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .nodes.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .nodes.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
   /* ── Node cards ── */
   .node {
@@ -194,6 +215,12 @@
   .node.proc .n-name { color: var(--proc); }
   .node.proc:hover { box-shadow: 0 6px 24px rgba(124,58,237,0.1); }
 
+  /* -- BRAID nodes */
+  .node.braid::before { background: linear-gradient(90deg, var(--braid), transparent); }
+  .node.braid { background: linear-gradient(165deg, var(--braid-dim), var(--bg-card) 60%); }
+  .node.braid .n-name { color: var(--braid); }
+  .node.braid:hover { box-shadow: 0 6px 24px rgba(190,24,93,0.1); }
+
   /* -- Memory nodes */
   .node.mem::before { background: linear-gradient(90deg, var(--mem), transparent); }
   .node.mem { background: linear-gradient(165deg, var(--mem-dim), var(--bg-card) 60%); }
@@ -222,6 +249,12 @@
   .node.out .n-name { color: var(--output); }
   .node.out:hover { box-shadow: 0 6px 24px rgba(13,148,136,0.1); }
 
+  /* -- Bus nodes */
+  .node.bus::before { background: linear-gradient(90deg, var(--bus), transparent); }
+  .node.bus { background: linear-gradient(165deg, var(--bus-dim), var(--bg-card) 60%); }
+  .node.bus .n-name { color: var(--bus); }
+  .node.bus:hover { box-shadow: 0 6px 24px rgba(99,102,241,0.1); }
+
   /* ── Flow connector SVG between layers ── */
   .flow-svg {
     display: block;
@@ -248,6 +281,78 @@
   }
 
   .flow-dot { animation: flowDown 2.4s ease-in-out infinite; }
+
+  /* ── BRAID Zone ── */
+  .braid-zone {
+    position: relative;
+    border: 1.5px solid rgba(190, 24, 93, 0.2);
+    border-radius: 16px;
+    padding: 24px 20px 24px;
+    margin-bottom: 8px;
+    background: radial-gradient(ellipse at 50% 30%, var(--braid-glow), transparent 70%);
+  }
+
+  .braid-zone::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(190,24,93,0.05), transparent 40%);
+    z-index: -1;
+  }
+
+  .braid-badge {
+    position: absolute;
+    top: -10px;
+    right: 24px;
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--bg);
+    color: var(--braid);
+    border: 1px solid rgba(190,24,93,0.2);
+    border-radius: 4px;
+    padding: 2px 10px;
+  }
+
+  .braid-desc {
+    text-align: center;
+    margin-top: 14px;
+  }
+
+  .braid-desc p {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: rgba(190,24,93,0.5);
+    line-height: 1.6;
+  }
+
+  .braid-agents {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .braid-agent-tag {
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    font-weight: 400;
+    background: rgba(190,24,93,0.05);
+    border: 1px solid rgba(190,24,93,0.12);
+    border-radius: 3px;
+    padding: 2px 8px;
+    color: rgba(190,24,93,0.55);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .braid-agent-tag:hover {
+    color: var(--braid);
+    border-color: rgba(190,24,93,0.3);
+  }
 
   /* ── Memory zone ── */
   .mem-zone {
@@ -298,6 +403,71 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(180,83,9,0.15), transparent);
     margin: 0 40px 16px;
+  }
+
+  /* ── Event Bus band ── */
+  .event-bus-band {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 20px;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, rgba(99,102,241,0.03), rgba(99,102,241,0.06), rgba(99,102,241,0.03));
+    border-radius: 8px;
+    border: 1px solid rgba(99,102,241,0.1);
+  }
+
+  .event-bus-band .bus-icon {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--bus);
+    white-space: nowrap;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .event-bus-band .bus-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--bus), transparent);
+    opacity: 0.2;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .event-bus-band .bus-line::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    width: 24px;
+    height: 4px;
+    background: var(--bus);
+    border-radius: 2px;
+    opacity: 0.5;
+    animation: busPulse 3s linear infinite;
+  }
+
+  @keyframes busPulse {
+    0% { left: -24px; }
+    100% { left: 100%; }
+  }
+
+  .event-bus-band .bus-events {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .event-bus-band .bus-event {
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    font-weight: 400;
+    background: rgba(99,102,241,0.06);
+    border: 1px solid rgba(99,102,241,0.12);
+    border-radius: 3px;
+    padding: 1px 7px;
+    color: rgba(99,102,241,0.55);
   }
 
   /* ── Feedback loop rails ── */
@@ -422,7 +592,6 @@
     opacity: 0.7;
   }
 
-  /* Pulsing ring behind the avatar */
   .human-avatar {
     position: relative;
     width: 52px;
@@ -529,13 +698,13 @@
   .loop-caption .loop-desc {
     font-size: 0.76rem;
     color: var(--text-dim);
-    max-width: 480px;
+    max-width: 540px;
     margin: 0 auto;
     line-height: 1.5;
   }
 
   /* ── Staggered entrance ── */
-  .layer, .mem-zone, .flow-svg, .human-hub {
+  .layer, .mem-zone, .braid-zone, .flow-svg, .human-hub, .event-bus-band {
     opacity: 0;
     transform: translateY(18px);
     animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -544,11 +713,12 @@
   .layer:nth-child(1) { animation-delay: 0.15s; }
   .flow-svg:nth-of-type(1) { animation-delay: 0.3s; }
   .layer:nth-child(3) { animation-delay: 0.4s; }
-  .flow-svg:nth-of-type(2) { animation-delay: 0.55s; }
-  .mem-zone { animation-delay: 0.65s; }
-  .flow-svg:nth-of-type(3) { animation-delay: 0.8s; }
-  .layer:nth-child(6) { animation-delay: 0.9s; }
-  .human-hub { animation-delay: 1.05s; }
+  .braid-zone { animation-delay: 0.55s; }
+  .event-bus-band { animation-delay: 0.7s; }
+  .mem-zone { animation-delay: 0.8s; }
+  .flow-svg:nth-of-type(3) { animation-delay: 0.9s; }
+  .layer:nth-child(8) { animation-delay: 1.0s; }
+  .human-hub { animation-delay: 1.15s; }
 
   @keyframes reveal {
     to { opacity: 1; transform: translateY(0); }
@@ -559,14 +729,20 @@
     .nodes.cols-6 { grid-template-columns: repeat(3, 1fr); }
     .nodes.cols-7 { grid-template-columns: repeat(4, 1fr); }
     .nodes.cols-5 { grid-template-columns: repeat(3, 1fr); }
+    .nodes.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    .nodes.cols-3 { grid-template-columns: repeat(2, 1fr); }
     .rail { flex: 0 0 36px; }
     .scene { padding: 32px 16px 48px; }
     header h1 { font-size: 1.8rem; }
   }
 
   @media (max-width: 600px) {
-    .nodes.cols-6, .nodes.cols-7, .nodes.cols-5 { grid-template-columns: repeat(2, 1fr); }
+    .nodes.cols-6, .nodes.cols-7, .nodes.cols-5, .nodes.cols-4, .nodes.cols-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
     .rail { display: none; }
+    .event-bus-band { flex-direction: column; text-align: center; }
+    .event-bus-band .bus-line { width: 100%; }
   }
 </style>
 </head>
@@ -577,6 +753,7 @@
   <header>
     <h1>Logan's Operating System</h1>
     <p class="sub">information architecture & learning loop</p>
+    <div class="version-tag">v2 &mdash; braid governance layer</div>
     <div class="accent-line"></div>
   </header>
 
@@ -589,7 +766,7 @@
         <div class="rail-particle" style="animation-delay: 2s;"></div>
       </div>
       <div class="rail-label">Context Injection</div>
-      <div class="rail-meta">QMD search / facts / reading prep</div>
+      <div class="rail-meta">QMD search / structural facts / rules</div>
       <div class="rail-track">
         <div class="rail-particle" style="animation-delay: 1s;"></div>
         <div class="rail-particle" style="animation-delay: 3s;"></div>
@@ -609,19 +786,19 @@
         <div class="nodes cols-6">
           <div class="node src">
             <div class="n-name">Granola Calls</div>
-            <div class="n-detail">Meeting transcripts<br>hourly sync</div>
+            <div class="n-detail">Meeting transcripts<br>hourly sync + stub detection</div>
           </div>
           <div class="node src">
             <div class="n-name">Email</div>
-            <div class="n-detail">4 accounts<br>Gmail API</div>
+            <div class="n-detail">4 accounts<br>Gmail API + MCP</div>
           </div>
           <div class="node src">
             <div class="n-name">Discord</div>
-            <div class="n-detail">Always-on bot<br>bidirectional</div>
+            <div class="n-detail">Always-on bot<br>bidirectional + routing</div>
           </div>
           <div class="node src">
             <div class="n-name">Calendar</div>
-            <div class="n-detail">4 accounts<br>all events</div>
+            <div class="n-detail">4 accounts<br>gcal enrichment</div>
           </div>
           <div class="node src">
             <div class="n-name">Apple Health</div>
@@ -634,7 +811,7 @@
         </div>
       </div>
 
-      <!-- Flow connectors -->
+      <!-- Flow: sources → processors -->
       <svg class="flow-svg" viewBox="0 0 1000 36" preserveAspectRatio="none">
         <line x1="100" y1="0" x2="100" y2="36"/>
         <line x1="270" y1="0" x2="270" y2="36"/>
@@ -658,43 +835,96 @@
         <div class="nodes cols-6">
           <div class="node proc">
             <div class="n-name">Meeting Processor</div>
-            <div class="n-detail">Commitments, follow-ups<br>content angles</div>
+            <div class="n-detail">Commitments, follow-ups<br>content angles, participants</div>
           </div>
           <div class="node proc">
             <div class="n-name">Sweep</div>
             <div class="n-detail">12h reconciliation<br>midnight + noon</div>
           </div>
           <div class="node proc">
-            <div class="n-name">Intake</div>
-            <div class="n-detail">Nightly pipeline<br>email + calendar scan</div>
+            <div class="n-name">Email Scanner</div>
+            <div class="n-detail">Urgency classification<br>deal flow detection</div>
           </div>
           <div class="node proc">
-            <div class="n-name">Reading Scout</div>
-            <div class="n-detail">Feed curation<br>preference learning</div>
+            <div class="n-name">Prep Agent</div>
+            <div class="n-detail">Session prep, ideation<br>frame cards, briefings</div>
           </div>
           <div class="node proc">
             <div class="n-name">Retrospective</div>
-            <div class="n-detail">Daily review, patterns<br>Growth Edge</div>
+            <div class="n-detail">Daily review, patterns<br>signal escalation</div>
           </div>
           <div class="node proc">
             <div class="n-name">Pollinate</div>
-            <div class="n-detail">2:30am, cross-domain<br>connection discovery</div>
+            <div class="n-detail">2:30am, cross-domain<br>reflective retrieval</div>
           </div>
         </div>
       </div>
 
+      <!-- Flow: processors → BRAID -->
       <svg class="flow-svg" viewBox="0 0 1000 36" preserveAspectRatio="none">
         <line x1="100" y1="0" x2="100" y2="36"/>
         <line x1="270" y1="0" x2="270" y2="36"/>
         <line x1="440" y1="0" x2="440" y2="36"/>
         <line x1="610" y1="0" x2="610" y2="36"/>
-        <line x1="780" y1="0" x2="780" y2="36"/>
         <circle class="flow-dot" cx="100" cy="18" r="2" style="color:var(--proc); animation-delay:0.2s"/>
         <circle class="flow-dot" cx="270" cy="18" r="2" style="color:var(--proc); animation-delay:0.6s"/>
         <circle class="flow-dot" cx="440" cy="18" r="2" style="color:var(--proc); animation-delay:1.0s"/>
         <circle class="flow-dot" cx="610" cy="18" r="2" style="color:var(--proc); animation-delay:1.4s"/>
-        <circle class="flow-dot" cx="780" cy="18" r="2" style="color:var(--proc); animation-delay:1.8s"/>
       </svg>
+
+      <!-- ── BRAID GOVERNANCE ZONE ── -->
+      <div class="braid-zone">
+        <span class="braid-badge">Discipline Layer</span>
+
+        <div class="layer" style="margin-bottom: 0;">
+          <div class="layer-head">
+            <div class="pip" style="background: var(--braid);"></div>
+            <div class="label" style="color: var(--braid);">BRAID &mdash; Bounded Reasoning for Autonomous Inference &amp; Decisions</div>
+            <div class="line" style="color: var(--braid);"></div>
+          </div>
+          <div class="nodes cols-3">
+            <div class="node braid">
+              <div class="n-name">Policy Layer</div>
+              <div class="n-detail">Hard rules per agent<br>injected before LLM calls<br>markdown policy files</div>
+            </div>
+            <div class="node braid">
+              <div class="n-name">Decision Graph</div>
+              <div class="n-detail">Explicit flow control<br>fetch &rarr; classify &rarr; verify &rarr; store<br>no hallucinated steps</div>
+            </div>
+            <div class="node braid">
+              <div class="n-name">Output Contract</div>
+              <div class="n-detail">Schema validation<br>before any DB write<br>graceful fallback on failure</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="braid-desc">
+          <p>Wraps 4 production agents &mdash; surgical, non-structural. Violations log signals, never crash.</p>
+        </div>
+
+        <div class="braid-agents">
+          <span class="braid-agent-tag">meeting_processor</span>
+          <span class="braid-agent-tag">sweep</span>
+          <span class="braid-agent-tag">email_scanner</span>
+          <span class="braid-agent-tag">prep</span>
+        </div>
+      </div>
+
+      <!-- ── EVENT BUS ── -->
+      <div class="event-bus-band">
+        <div class="bus-icon">Event Bus</div>
+        <div class="bus-line"></div>
+        <div class="bus-events">
+          <span class="bus-event">commitment</span>
+          <span class="bus-event">completion</span>
+          <span class="bus-event">correction</span>
+          <span class="bus-event">avoidance</span>
+          <span class="bus-event">momentum</span>
+          <span class="bus-event">energy</span>
+          <span class="bus-event">loop-open</span>
+          <span class="bus-event">loop-close</span>
+        </div>
+      </div>
 
       <!-- ── MEMORY ZONE ── -->
       <div class="mem-zone">
@@ -702,7 +932,7 @@
         <div class="layer" style="margin-bottom: 0;">
           <div class="layer-head">
             <div class="pip" style="background: var(--mem);"></div>
-            <div class="label" style="color: var(--mem);">Persistent Memory Architecture</div>
+            <div class="label" style="color: var(--mem);">Persistent Memory Architecture v2</div>
             <div class="line" style="color: var(--mem);"></div>
           </div>
           <div class="nodes cols-5">
@@ -712,19 +942,19 @@
             </div>
             <div class="node mem">
               <div class="n-name">Session Transcripts</div>
-              <div class="n-detail">Full conversation<br>history</div>
+              <div class="n-detail">Full conversation<br>history, auto-exported</div>
             </div>
             <div class="node mem mem-core">
               <div class="n-name">memory.db</div>
-              <div class="n-detail">SQLite &mdash; 20+ tables<br>The brain of the system</div>
+              <div class="n-detail">SQLite &mdash; 20+ tables<br>Three-tier retrieval</div>
             </div>
             <div class="node mem">
-              <div class="n-name">Tasks.md</div>
-              <div class="n-detail">Master task list<br>status tracking</div>
+              <div class="n-name">Domain Knowledge</div>
+              <div class="n-detail">6 domains: content<br>consulting, podcasting&hellip;</div>
             </div>
             <div class="node mem">
               <div class="n-name">Obsidian Vault</div>
-              <div class="n-detail">Full knowledge<br>archive</div>
+              <div class="n-detail">Full knowledge<br>archive + projects</div>
             </div>
           </div>
         </div>
@@ -733,15 +963,17 @@
           <span class="db-tag">facts</span>
           <span class="db-tag">commitments</span>
           <span class="db-tag">follow_ups</span>
+          <span class="db-tag">behavioral_signals</span>
+          <span class="db-tag">rules</span>
           <span class="db-tag">content_ideas</span>
           <span class="db-tag">health_daily</span>
           <span class="db-tag">reading_items</span>
-          <span class="db-tag">reading_prefs</span>
           <span class="db-tag">pollinations</span>
           <span class="db-tag">avoidance_log</span>
           <span class="db-tag">effort_log</span>
           <span class="db-tag">knowledge_profile</span>
           <span class="db-tag">milestones</span>
+          <span class="db-tag">health_pillars</span>
         </div>
 
         <div class="mem-divider"></div>
@@ -749,37 +981,37 @@
         <div class="layer" style="margin-bottom: 0;">
           <div class="layer-head">
             <div class="pip" style="background: var(--learn);"></div>
-            <div class="label" style="color: var(--learn);">Learning Layer</div>
+            <div class="label" style="color: var(--learn);">Learning &amp; Retrieval Layer</div>
             <div class="line" style="color: var(--learn);"></div>
           </div>
-          <div class="nodes cols-5">
+          <div class="nodes cols-7">
             <div class="node learn">
-              <div class="n-name">Preference Learning</div>
-              <div class="n-detail">Reading feedback<br>pillar weights, scores</div>
+              <div class="n-name">Operational</div>
+              <div class="n-detail">Daily execution<br>recent + relevant</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Structural</div>
+              <div class="n-detail">Never-decay facts<br>pinned, corrections</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Reflective</div>
+              <div class="n-detail">Inverted scoring<br>90-day half-life</div>
             </div>
             <div class="node learn">
               <div class="n-name">Pattern Detection</div>
               <div class="n-detail">Avoidance signals<br>momentum, time</div>
             </div>
             <div class="node learn">
-              <div class="n-name">Escalation Tracking</div>
-              <div class="n-detail">Follow-up aging<br>relationship risk</div>
-            </div>
-            <div class="node learn">
-              <div class="n-name">Knowledge Profile</div>
-              <div class="n-detail">Concept mastery<br>reinforcement counts</div>
-            </div>
-            <div class="node learn">
-              <div class="n-name">Behavioral Adaptation</div>
-              <div class="n-detail">CLAUDE.md updates<br>tone calibration</div>
-            </div>
-            <div class="node learn">
-              <div class="n-name">Learning Loop</div>
-              <div class="n-detail">Weekly evolution<br>system self-improvement</div>
+              <div class="n-name">Rule Escalation</div>
+              <div class="n-detail">3+ signals in 14d<br>&rarr; auto-rule</div>
             </div>
             <div class="node learn">
               <div class="n-name">Content Scout</div>
-              <div class="n-detail">Idea mining<br>angle generation</div>
+              <div class="n-detail">CK frames, angles<br>compound knowledge</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Learning Loop</div>
+              <div class="n-detail">Weekly evolution<br>double-loop review</div>
             </div>
           </div>
         </div>
@@ -807,23 +1039,23 @@
         <div class="nodes cols-5">
           <div class="node out">
             <div class="n-name">Morning Briefing</div>
-            <div class="n-detail">Weather, calendar<br>priorities, health</div>
+            <div class="n-detail">Calendar, priorities<br>health, experiments</div>
           </div>
           <div class="node out">
-            <div class="n-name">Follow-up Queue</div>
-            <div class="n-detail">Escalation tiers<br>recent / stale / critical</div>
+            <div class="n-name">Discord Channels</div>
+            <div class="n-detail">Routed by topic<br>briefing, capita, content</div>
           </div>
           <div class="node out">
-            <div class="n-name">Approval Queue</div>
-            <div class="n-detail">Pre-drafted messages<br>awaiting review</div>
+            <div class="n-name">Day Station</div>
+            <div class="n-detail">Ideate + Reflect<br>port 8091</div>
           </div>
           <div class="node out">
             <div class="n-name">Pollination Insights</div>
             <div class="n-detail">Cross-domain links<br>novelty scored</div>
           </div>
           <div class="node out">
-            <div class="n-name">Dashboard</div>
-            <div class="n-detail">TikTok, Substack<br>website analytics</div>
+            <div class="n-name">Task Tinder</div>
+            <div class="n-detail">Swipe prioritization<br>sprint flow</div>
           </div>
         </div>
       </div>
@@ -853,12 +1085,14 @@
             <span class="human-action">corrects behavior</span>
             <span class="human-action">sets preferences</span>
             <span class="human-action">triggers actions</span>
+            <span class="human-action">Discord commands</span>
           </div>
         </div>
         <div class="loop-caption">
           <div class="loop-title">The Learning Loop</div>
           <div class="loop-desc">
-            Every correction, completion, and preference feeds back into memory &mdash; the system learns daily
+            Every correction, completion, and preference feeds back through the event bus into memory.
+            BRAID ensures agents act on real data, not hallucinated context &mdash; the system disciplines itself daily.
           </div>
         </div>
       </div>
@@ -872,7 +1106,7 @@
         <div class="rail-particle" style="animation-delay: 2.5s;"></div>
       </div>
       <div class="rail-label">Feedback Loop</div>
-      <div class="rail-meta">corrections / preferences / completions</div>
+      <div class="rail-meta">corrections / signals / rules / completions</div>
       <div class="rail-track">
         <div class="rail-particle" style="animation-delay: 1.5s;"></div>
         <div class="rail-particle" style="animation-delay: 3.5s;"></div>
