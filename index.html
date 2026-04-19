@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logan's Operating System — Architecture Map v2</title>
+<title>Logan's Operating System — Architecture Map v3</title>
+<meta name="description" content="The full architecture of Logan Currie's personal AI operating system. Claude Code + persistent memory + autonomous agents + BRAID governance + episodic memory. Open book — every layer documented.">
+<link rel="canonical" href="https://loganhc-09.github.io/operating-system-map/">
+<meta property="og:title" content="Logan's Operating System — Architecture Map v3">
+<meta property="og:description" content="The full architecture of Logan Currie's personal AI operating system. Open book — every layer documented.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://loganhc-09.github.io/operating-system-map/">
+<meta property="og:site_name" content="Logan Currie">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Logan's Operating System — Architecture Map v3">
+<meta name="twitter:description" content="The full architecture of a personal AI operating system. Open book.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
@@ -753,7 +763,7 @@
   <header>
     <h1>Logan's Operating System</h1>
     <p class="sub">information architecture & learning loop</p>
-    <div class="version-tag">v2 &mdash; braid governance layer</div>
+    <div class="version-tag">v3 &mdash; episodic memory + delegation</div>
     <div class="accent-line"></div>
   </header>
 
@@ -857,6 +867,18 @@
             <div class="n-name">Pollinate</div>
             <div class="n-detail">2:30am, cross-domain<br>reflective retrieval</div>
           </div>
+          <div class="node proc">
+            <div class="n-name">Triage Learner</div>
+            <div class="n-detail">Learns from swipes<br>39 patterns, auto-filter</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Delegation</div>
+            <div class="n-detail">Haiku execution<br>research + drafts, multimedia</div>
+          </div>
+          <div class="node proc">
+            <div class="n-name">Staleness Watchdog</div>
+            <div class="n-detail">6:15am failure detector<br>disable-and-forget, cron silence</div>
+          </div>
         </div>
       </div>
 
@@ -923,6 +945,9 @@
           <span class="bus-event">energy</span>
           <span class="bus-event">loop-open</span>
           <span class="bus-event">loop-close</span>
+          <span class="bus-event">episode</span>
+          <span class="bus-event">rule-promoted</span>
+          <span class="bus-event">triage-signal</span>
         </div>
       </div>
 
@@ -932,13 +957,13 @@
         <div class="layer" style="margin-bottom: 0;">
           <div class="layer-head">
             <div class="pip" style="background: var(--mem);"></div>
-            <div class="label" style="color: var(--mem);">Persistent Memory Architecture v2</div>
+            <div class="label" style="color: var(--mem);">Persistent Memory Architecture v3</div>
             <div class="line" style="color: var(--mem);"></div>
           </div>
           <div class="nodes cols-5">
             <div class="node mem">
-              <div class="n-name">QMD Semantic Index</div>
-              <div class="n-detail">3 collections: vault<br>memory, sessions</div>
+              <div class="n-name">QMD Daemon</div>
+              <div class="n-detail">port 8182, always-on<br>FTS + semantic hybrid</div>
             </div>
             <div class="node mem">
               <div class="n-name">Session Transcripts</div>
@@ -955,6 +980,25 @@
             <div class="node mem">
               <div class="n-name">Obsidian Vault</div>
               <div class="n-detail">Full knowledge<br>archive + projects</div>
+            </div>
+          </div>
+
+          <div class="nodes cols-4" style="margin-top: 10px;">
+            <div class="node mem">
+              <div class="n-name">Bitemporal Facts</div>
+              <div class="n-detail">when-happened<br>when-recorded, history</div>
+            </div>
+            <div class="node mem">
+              <div class="n-name">Relations</div>
+              <div class="n-detail">edges between entities<br>people, projects, ideas</div>
+            </div>
+            <div class="node mem">
+              <div class="n-name">Episode Store</div>
+              <div class="n-detail">few-shot episodes<br>behavior-relevant context</div>
+            </div>
+            <div class="node mem">
+              <div class="n-name">Compile Pass</div>
+              <div class="n-detail">Sun 11pm digest<br>signals &rarr; episodes</div>
             </div>
           </div>
         </div>
@@ -974,6 +1018,10 @@
           <span class="db-tag">knowledge_profile</span>
           <span class="db-tag">milestones</span>
           <span class="db-tag">health_pillars</span>
+          <span class="db-tag">episodes</span>
+          <span class="db-tag">relations</span>
+          <span class="db-tag">fact_history</span>
+          <span class="db-tag">triage_patterns</span>
         </div>
 
         <div class="mem-divider"></div>
@@ -984,7 +1032,7 @@
             <div class="label" style="color: var(--learn);">Learning &amp; Retrieval Layer</div>
             <div class="line" style="color: var(--learn);"></div>
           </div>
-          <div class="nodes cols-7">
+          <div class="nodes cols-4">
             <div class="node learn">
               <div class="n-name">Operational</div>
               <div class="n-detail">Daily execution<br>recent + relevant</div>
@@ -996,6 +1044,10 @@
             <div class="node learn">
               <div class="n-name">Reflective</div>
               <div class="n-detail">Inverted scoring<br>90-day half-life</div>
+            </div>
+            <div class="node learn">
+              <div class="n-name">Episode Retrieval</div>
+              <div class="n-detail">few-shot at session start<br>behavior-relevant context</div>
             </div>
             <div class="node learn">
               <div class="n-name">Pattern Detection</div>
@@ -1042,12 +1094,12 @@
             <div class="n-detail">Calendar, priorities<br>health, experiments</div>
           </div>
           <div class="node out">
-            <div class="n-name">Discord Channels</div>
-            <div class="n-detail">Routed by topic<br>briefing, capita, content</div>
+            <div class="n-name">Discord (6 channels)</div>
+            <div class="n-detail">inbox / morning / meeting-prep<br>meeting-digest / delegation / scout</div>
           </div>
           <div class="node out">
-            <div class="n-name">Day Station</div>
-            <div class="n-detail">Ideate + Reflect<br>port 8091</div>
+            <div class="n-name">Dashboard v2</div>
+            <div class="n-detail">localhost:8091<br>Task Tinder + Intel + Day Station</div>
           </div>
           <div class="node out">
             <div class="n-name">Pollination Insights</div>
